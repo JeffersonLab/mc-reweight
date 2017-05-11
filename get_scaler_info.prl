@@ -8,6 +8,7 @@
 use strict;
 require 5.002;
 use English;
+use Cwd;
 
 my $numargs = scalar(@ARGV);
 #if(($numargs < 2)){
@@ -17,13 +18,15 @@ my $numargs = scalar(@ARGV);
 
 my $runno = $ARGV[0];
 
+my $pwd = cwd();
+
 #######################################################
 # Open up the gen*****.txt file
 
 # PUT THE PATH OF YOUR SCALER DIRECTORY HERE
 #my $scalerpath  = "/work/hu/disk2/Tvaskis/E02-109_E04-001/Analyzer/replay/scalers/";
 #my $scalerpath  = "/lustre/expphy/work/hallc/rosen07tmp/simona/pass3/scalers/";
-my $scalerpath  = "/lustre/expphy/work/hallc/shms/pooser/mc-recon-skeleton-test2-dir/input/reports/";
+my $scalerpath  = "$pwd/input/reports/";
 
 
 my $genfilename = join "", $scalerpath, "gen", $runno, ".txt";
