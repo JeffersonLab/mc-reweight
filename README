@@ -109,9 +109,25 @@ A plot of the comparisons will be printed to a postscript file called
 \ Eric P.'s README
 \--\--\--\--\--\--\
 
-In order to run the example, you will need to copy the file /scratch/pooser/input.tar.gz
-into the top level directory and unpack it via. tar -xvf input.tar.gz.  
-This will overwrite your current input directory however, it will maintain the structure.
+This repository is a "container" for the framework to perform the mc-reweighting in
+an orgainzed fashion.  The only code in the repository is the source code
+which has been customized to work in this particular framework and the paw macro
+used to make histograms. 
+
+In order to run the example on the ifarm, you will need to unpack the 
+file /scratch/pooser/input.tar.gz in the top level directory 
+via. tar -xvf /scratch/pooser/input.tar.gz.  This will overwrite your 
+current input directory however, it will maintain the structure and fill the 
+directories with the input files needed to run the example.
+
+To run the example in place simply do:
+cd SRC
+  make
+cd ../
+./mc-reweight.sh 53214
+cd paw/macros
+paw++
+  exec extract_cs.kumac
 
 /--/--/--/--/--/--/--/
 / Directroy structure
@@ -160,14 +176,4 @@ Path of least resistance, do it on the farm...
   On the ifarm do: setup cernlib
   Descend into paw/macros and enter "paw++"
   In the interactive session enter "exec extract_cs.kumac"
-
-To run the example in place simply do:
-cd SRC
-  make
-cd ../
-./mc-reweight.sh 53214
-cd paw/macros
-paw++
-  exec extract_cs.kumac
-
 
