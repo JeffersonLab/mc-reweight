@@ -1,0 +1,144 @@
+#!/usr/bin/perl -w
+##!/usr/local/bin/perl -w
+##!/u/apps/bin/perl -w
+
+# 06/06/02 - parses scaler files and records run #, trigger efficiencies, and 
+# rates to a data file.
+
+use strict;
+require 5.002;
+use English;
+
+my $numargs = scalar(@ARGV);
+#if(($numargs < 2)){
+#    print "\n  HEY! Usage is 'get_runinfo.prl <run> <var1> [var2] [var3] ...'\n";
+#    exit(1);
+#}
+
+my $runno = $ARGV[0];
+
+#######################################################
+# Open up the gen*****.txt file
+
+# PUT THE PATH OF YOUR SCALER DIRECTORY HERE
+#my $scalerpath  = "/work/hu/disk2/Tvaskis/E02-109_E04-001/Analyzer/replay/scalers/";
+#my $scalerpath  = "/lustre/expphy/work/hallc/rosen07tmp/simona/pass3/scalers/";
+my $scalerpath  = "/lustre/expphy/work/hallc/shms/pooser/mc-recon-skeleton-test2-dir/input/reports/";
+
+
+my $genfilename = join "", $scalerpath, "gen", $runno, ".txt";
+
+open(SCALERFILE,$genfilename) or die "\n Cannot find $genfilename\n\n";
+
+my @tmp_str;
+my $target;
+my $elt;
+my $edt;
+my $clt;
+my $cdt;
+my $HMS_rate;
+my $HMS_34;
+my $HMS_tof;
+my $HMS_prlo;
+my $HMS_trig;
+my $ps;
+my $HMS_trackeff;
+my $BOT;
+my $BCM1;
+my $BCM2;
+my $avebcm;
+my $Ebeam;
+my $Ehms;
+my $Theta;
+my $avecharge;
+my $q1;
+my $q2;
+
+
+while(<SCALERFILE>){
+  
+   if(/helect.  D.T./){
+    @tmp_str=split();
+    $edt = $tmp_str[3]; 
+    $elt = 1. - $edt/100.;
+  }                   
+   elsif(/hcomputer/){
+    @tmp_str=split();
+    $cdt = $tmp_str[3];
+    $clt = 1. - $cdt/100.;
+  }
+    elsif(/targ num/){
+    @tmp_str=split();
+    $target = $tmp_str[3];
+  }
+    elsif(/Prescale Factors:/){
+    @tmp_str=split(); 
+    $ps = $tmp_str[3];
+  }
+   elsif(/hSCIN    =/){
+#   elsif(/hS1      =/){
+     @tmp_str=split(/=/);   
+     @tmp_str=split(/\[/);
+     $tmp_str[1]=~s/\].*//; 
+     $HMS_rate = $tmp_str[1]/1000;
+  }            
+   elsif(/HMS 3/){
+     @tmp_str=split();
+     $HMS_34 = $tmp_str[4];
+  } 
+   elsif(/hSTOF =/){
+     @tmp_str=split();
+     $HMS_tof = $tmp_str[2];
+  }   
+   elsif(/hprlo e- effic/){
+     @tmp_str=split();
+     $HMS_prlo = $tmp_str[4];
+  }
+
+   elsif(/HMS fid effic  =/){
+     @tmp_str=split();
+     $HMS_trackeff = $tmp_str[4] ;
+  } 
+   elsif(/bocur/){
+     @tmp_str=split();
+     $BCM1 = $tmp_str[1];
+     $q1 =  $tmp_str[2];
+  } 
+
+    elsif(/bo2cur/){
+     @tmp_str=split();
+     $BCM2 = $tmp_str[1];
+     $q2 =  $tmp_str[2];
+  }  
+
+   elsif(/E_beam/){
+     @tmp_str=split();
+     $Ebeam = $tmp_str[2];
+  } 
+   elsif(/P_mom HMS/){
+     @tmp_str=split();
+     $Ehms = $tmp_str[3];
+  } 
+   elsif(/Theta HMS/){
+     @tmp_str=split();
+     $Theta = $tmp_str[3];
+  }             
+}
+
+
+#$avecharge = ($charge1+$charge2)/2.;
+#$avebcm = ($BCM1+$BCM2)/2.;
+close(SCALERFILE) or die "\n Cannot close $genfilename\n\n";
+print($target, " ",$Ebeam,  " ", $Ehms, " ", $Theta, " ", $ps, " ", $BCM1, " ", $BCM2," ", $q1, " ", $q2, " ", $clt, " ", $elt, " ", $HMS_trackeff, " ", $HMS_tof," ", $HMS_34," ", $HMS_prlo," ", $HMS_rate,  "\n");
+exit(0);
+
+
+
+
+
+
+
+
+
+
+

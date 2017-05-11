@@ -1,0 +1,690 @@
+Macro extract_cs
+
+close 0
+
+hi/del *
+ve/del *
+exec ../settings/pawopts.kumac
+zone 2 4 
+ 
+
+**  Set histogram limits  **
+
+delmin = -9.
+delmax = 10.
+delwidth = 1.
+ndelbins = ([delmax]-[delmin])/[delwidth]
+nthbins = 20
+ 
+**  Additional offsets adjustments  **
+
+dpo = 0.0
+dtheta = 0.0  
+dto = -0.0
+dy = 0.0
+*dto = -1.2
+*dy = 0.14
+
+** next is for dummy  **
+*dy = 0.14      
+
+
+**  Additional options  **
+
+fpcuts = 0
+dipcuts = 0
+thetacuts = 0
+usedelcor = 0
+useant = 0.
+w2low = 0.05
+w2hi = 10.0
+ 
+ve/cr tmpvect(5)
+ve/input tmpvect(1) [delmax]
+ve/input tmpvect(2) [ndelbins]
+
+ve/input tmpvect(3) [nthbins]
+ve/input tmpvect(4) [usedelcor]
+ve/input tmpvect(5) [useant]
+vec/write tmpvect pawtmpfile.dat '4x,5f10.4' 'OC'
+
+**** Jan05 run #s and MC scale factors  ****
+
+** C1 @ 2.3 at 30 deg **
+
+runnum = 53214
+mcscale = 0.00188994245
+
+
+
+* ***********   Get Scaler Info   **************
+kuip/sh rm ../input/scalers/scalers.in
+kuip/sh ./../../get_scaler_info.prl [runnum] > ../input/scalers/scalers.in
+ve/cr scal(13)
+ve/read scal ../input/scalers/scalers.in
+ebeam = scal(2)
+hsec = scal(3)
+thetac = scal(4)
+targetnum = scal(1)
+
+mess
+mess !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+mess
+mess Ebeam: [ebeam]  Phms: [hsec] thetac: [thetac]  
+mess
+mess !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+mess
+
+**********!!!!!!!!!!!!***********
+
+mp = .9382727
+mp2 = [mp]*[mp] 
+
+cryo = 0
+if [targetnum] = 11 then
+ cryo = 1
+endif
+if [targetnum] = 15 then
+ cryo = 1
+endif
+
+close 30
+close 20
+
+***********************************
+
+*hsec = [hsec]*(1.0-0.00055)
+*thetac = [thetac] - .034
+*thetac = [thetac] - .014
+
+mess Ebeam: [ebeam]  Phms: [hsec] thetac: [thetac]
+
+thetac = [thetac]*3.14159/180.
+thetac = [thetac]+[dtheta]/1000.
+ve/cr tmp2vect(1)
+ve/input tmp2vect(1) [thetac]
+APPlication COMIS QUIT
+vector tmp2vect
+tmp2vect(1) = sin(tmp2vect(1)/2.)
+tmp2vect(1) = tmp2vect(1)*tmp2vect(1)
+end
+quit
+s2c = tmp2vect(1)
+
+numin = [ebeam]-[hsec]*1.10
+numax = [ebeam]-[hsec]*0.91
+q2min = 4.*[ebeam]*[hsec]*0.91*[s2c]
+q2max = 4.*[ebeam]*[hsec]*1.10*[s2c]
+
+mess s2c = [s2c]
+
+w2min = ([mp2])+2.*[mp]*([numin])-([q2max])
+w2max = ([mp2])+2.*[mp]*([numax])-([q2min])
+
+*w2min = 1.5
+*w2max = 4.0
+
+mess [q2min] [q2max] [w2min] [w2max]
+
+ttmin = (-1.875+[mp2]+2.*[mp]*[numin])/4./[ebeam]/([hsec]*1.10)
+ttmin = 2.*sqrt([ttmin])
+ttmax = (-1.875+[mp2]+2.*[mp]*[numax])/4./[ebeam]/([hsec]*0.91)
+ttmax = 2.*sqrt([ttmax])
+
+
+mess thetamin = [ttmin], thetamax = [ttmax]
+
+tmin = [thetac] - 0.035
+tmax = [thetac] + 0.035
+
+if [cryo]=1 then
+ hi/file 20 recon[runnum].rzdat 4096
+else
+* hi/file 20 hms[runnum].rzdat 4096
+* hi/file 20 /lustre/expphy/work/hallc/rosen07tmp/simona/pass3/paw/hms[runnum].rzdat 4096
+ hi/file 20 ../../input/hms-data/hms[runnum].rzdat 4096
+endif
+
+ hi/file 30 ../../output/mc-ntuples/mc[runnum].rzdat 4096
+
+
+filename = ../output/data/sigma[runnum].dat
+file2 = ../output/data/rat[runnum].dat
+
+***********************************
+
+
+Ntuple/Cuts $1 hcer_npe>2.0
+*Ntuple/Cuts $1 hcer_npe>0.0
+Ntuple/Cuts $2 (hsdelta<[delmax]).AND.(hsdelta>[delmin])
+Ntuple/Cuts $3 hsshtrk>0.7
+Ntuple/Cuts $4 abs(1000.*hsyptar)<40.
+Ntuple/Cuts $5 abs(1000.*hsxptar)<85.
+Ntuple/Cuts $6 hsytar<1000
+Ntuple/Cuts $9 abs(hsyfp+0.)<100000.
+
+*Ntuple/Cuts $9 abs(1000.*hsypfp-0.)<5.
+
+Ntuple/Cuts $11 fail_id=0.
+Ntuple/Cuts $12 (dppr<[delmax]).AND.(dppr>[delmin])
+Ntuple/Cuts $13 abs(dthr)<40.
+Ntuple/Cuts $14 abs(dphr)<85.
+Ntuple/Cuts $15 yrec<100.
+Ntuple/Cuts $16 abs(dppi)<[delmax]
+Ntuple/Cuts $17 abs(dthi)<40.
+Ntuple/Cuts $18 abs(dphi)<85.
+
+
+Ntuple/Cuts $10 abs(yfoc+0.)<10000.
+
+*Ntuple/Cuts $10 abs(1000.*dydz-0.)<5.
+
+
+
+dthrc = dthr+[dto]
+dphrc = dphr+[dpo]
+
+
+***  Construct derived kinematic variables including offsets ***
+
+thetamc = acos(cos((dphr+[dpo])/1000.)*cos([thetac]-(dthr+[dto])/1000.))
+s2d = sin(hstheta/2.)*sin(hstheta/2.)
+s2mc = sin([thetamc]/2.)*sin([thetamc]/2.)
+q2d = 4.*[ebeam]*hse*[s2d]
+q2mc = 4.*[ebeam]*hse*[s2mc]
+w2d = 0.9382723*0.9382723+2.*0.9382723*([ebeam]-hse)-[q2d]
+w2mc = 0.9382723*0.9382723+2.*0.9382723*([ebeam]-hse)-[q2mc]
+Ntuple/Cuts $7 [w2d]>[w2low].AND.[w2d]<[w2hi]
+Ntuple/Cuts $19 [w2mc]>[w2low].AND.[w2mc]<[w2hi]
+
+
+*ntu/pl //LUN30/9040.[w2mc] $11.AND.$12.AND.$13.AND.$14.AND.born
+*ntu/pl //LUN20/9010.[w2d]  $1.AND.$2.AND.$3.AND.$4.AND.$5.AND.$6
+
+dt = ([thetamc]-[thetac])-[dtheta]/1000.
+
+
+***  Apply (or not) theta cuts  ***
+
+if [thetacuts]=1 then
+ Ntuple/Cuts $26 abs(hstheta-[thetac])<.028
+ Ntuple/Cuts $27 abs([dt])<.028
+else
+ Ntuple/Cuts $26 abs(hstheta-[thetac])<.035
+ Ntuple/Cuts $27 abs([dt])<.035
+endif
+
+
+*mess [dt]
+
+phspwt = cos([dt]/1000.)*cos([dt]/1000.)*cos([dt]/1000.)
+
+
+***  Define dipole exit and vacuum pipe cuts  ***
+
+vcany = hsyfp-625.0*hsypfp
+vcanx = hsxfp-625.0*hsxpfp
+vcaney = hsyfp-560.23*hsypfp
+vcanex = hsxfp-560.23*hsxpfp
+pipey = hsyfp-263.05*hsypfp
+pipex = hsxfp-263.05*hsxpfp
+
+Ntuple/Cuts $20 abs([vcany])<21.5
+Ntuple/Cuts $21 ([vcanx]*[vcanx]+[vcany]*[vcany])<970.0
+Ntuple/Cuts $22 ([vcanex]*[vcanex]+[vcaney]*[vcaney])<1170.0
+Ntuple/Cuts $23 ([pipex]*[pipex]+[pipey]*[pipey])<1530.0
+
+
+****  Define focal plane cuts  ****
+
+xpfpmc = dxdz-0.00
+
+*Ntuple/Cuts $51 hsypfp>(0.010-0.0006*hsyfp).or.hsypfp<(-0.010+0.0006*hsyfp)
+*Ntuple/Cuts $52 hsypfp>(0.0075-0.00018*hsxfp).or.hsypfp<(-0.0075+0.00018*hsxfp)
+*Ntuple/Cuts $53 hsypfp>(0.009-0.12*hsxpfp).or.(hsypfp)<(-0.009+0.12*hsxpfp)
+*Ntuple/Cuts $54 abs(hsyfp)>(-0.5+0.3*abs(hsxfp)).AND.abs(hsyfp+9.)<9.0
+
+Ntuple/Cuts $51 hsypfp>(0.0115+0.0006*hsyfp).or.hsypfp<(-0.0115+0.0006*hsyfp) 
+Ntuple/Cuts $52 hsypfp<(-0.01+0.00025*hsxfp).or.hsypfp>(0.01-0.00025*hsxfp) 
+Ntuple/Cuts $53 abs(hsyfp)>(-2.-0.45*hsxfp).AND.abs(hsyfp)>(-2.+0.45*hsxfp) 
+*Ntuple/Cuts $54 hsxfp<(15.+(35./0.04)*hsxpfp)
+Ntuple/Cuts $54 abs(hsxfp)>8.
+
+
+Ntuple/Cuts $55 .not.($51.AND.$52.AND.$53.AND.$54)
+
+*Ntuple/Cuts $55 .not.($51.AND.$54)
+
+*Ntuple/Cuts $61 dydz>(0.010-0.0006*yfoc).or.dydz<(-0.010+0.0006*yfoc)
+*Ntuple/Cuts $62 dydz>(0.0075-0.00018*xfoc).or.dydz<(-0.0075+0.00018*xfoc)
+*Ntuple/Cuts $63 dydz>(0.009-0.12*[xpfpmc]).or.dydz<(-0.009+0.12*[xpfpmc])
+*Ntuple/Cuts $64 abs(yfoc)>(-0.5+0.3*abs(xfoc)).AND.abs(yfoc+9.)<9.
+
+Ntuple/Cuts $61 dydz>(0.0115+0.0006*yfoc).or.dydz<(-0.0115+0.0006*yfoc)
+Ntuple/Cuts $62 dydz>(0.01-0.00025*xfoc).or.dydz<(-0.01+0.00025*xfoc)
+Ntuple/Cuts $63 abs(dydz)>(-2.-0.45*[xpfpmc]).AND.abs(dydz)>(-2.+0.45*[xpfpmc])
+*Ntuple/Cuts $64 xfoc<(15.+(35/0.04)*dxdz)
+Ntuple/Cuts $64 abs(xfoc)>8.
+
+Ntuple/Cuts $65 .not.($61.AND.$62.AND.$63.AND.$64)
+
+*Ntuple/Cuts $65 .not.($61.AND.$64)
+
+****  End focal plane cuts  ****
+
+
+Ntuple/Cuts $30 $1.AND.$2.AND.$3.AND.$4.AND.$5.AND.$6.AND.$7.AND.$26.AND.$9
+if [dipcuts] = 1 then
+ Ntuple/Cuts $31 $30.AND.$20.AND.$21.AND.$22.AND.$23
+else 
+ Ntuple/Cuts $31 $30
+endif
+if [fpcuts] = 1 then
+ Ntuple/Cuts $32 $31.AND.$55
+else 
+ Ntuple/Cuts $32 $31
+endif
+
+datalun = 9010
+
+if [cryo]=1 then
+ Ntuple/Cuts $33  $32*subwt
+ datalun = 9020
+else
+ Ntuple/Cuts $33 $32
+endif
+
+if [fpcuts] = 1 then
+ Ntuple/Cuts $40 $11.AND.$12.AND.$13.AND.$14.AND.$15.AND.$19.AND.$27.AND.$65.AND.$10
+else
+ Ntuple/Cuts $40 $11.AND.$12.AND.$13.AND.$14.AND.$15.AND.$19.AND.$27.AND.$10
+endif
+
+Ntuple/Cuts $41 $40*[phspwt]
+/HISTOGRAM/CREATE/1DHISTO 360 'Y target (cm)' 40 -4 4 0.
+/HISTOGRAM/CREATE/1DHISTO 460 'Y target (cm)' 40 -4 4 0.
+/HISTOGRAM/CREATE/1DHISTO 400 '[d]p/p ("Y#)' [ndelbins] [delmin] [delmax] 0.
+/HISTOGRAM/CREATE/1DHISTO 500 '[d]p/p ("Y#)' [ndelbins] [delmin] [delmax] 0.
+/HISTOGRAM/CREATE/1DHISTO 900 '[d]p/p ("Y#) (Ratio  DATA/MC)' [ndelbins] [delmin] [delmax] 0.
+/HISTOGRAM/CREATE/1DHISTO 770 '[d] correction' [ndelbins] [delmin] [delmax] 0.
+/HISTOGRAM/CREATE/1DHISTO 410 'Y^</>! target (mrad)'  40 -40 40 0. 
+/HISTOGRAM/CREATE/1DHISTO 510 'Y^</>! target (mrad)'  40 -40 40 0. 
+/HISTOGRAM/CREATE/1DHISTO 420 'X^</>! target (mrad)'  40 -85 85 0. 
+/HISTOGRAM/CREATE/1DHISTO 520 'X^</>! target (mrad)'  40 -85 85 0. 
+/HISTOGRAM/CREATE/1DHISTO 440 'W^2! (GeV^2!)'  30 [w2min] [w2max] 0. 
+/HISTOGRAM/CREATE/1DHISTO 540 'W^2! (GeV^2!)'  30 [w2min] [w2max] 0. 
+/HISTOGRAM/CREATE/1DHISTO 430 '[Q] - [Q]?c! (mrad)'  18 -32.5 32.5 0. 
+/HISTOGRAM/CREATE/1DHISTO 530 '[Q] - [Q]?c! (mrad)'  18 -32.5 32.5 0. 
+*/HISTOGRAM/CREATE/1DHISTO 930 '[Q] - [Q]?c! (Ratio  DATA/MC)'  20 -35 35 0. 
+/HISTOGRAM/CREATE/1DHISTO 930 '[Q] - [Q]?c! (Ratio  DATA/MC)'  18 -32.5 32.5 0. 
+/HISTOGRAM/CREATE/1DHISTO 700 '[Q] model'  40 [tmin] [tmax] 0.
+
+
+
+ve/create sigmod([ndelbins])
+ve/create scale([ndelbins])
+ve/create scale1([ndelbins])
+ve/create ebeamv([ndelbins])
+ve/create eprime([ndelbins])
+ve/create thetav([ndelbins])
+ve/create errd([ndelbins])
+ve/create errm([ndelbins])
+ve/create yd([ndelbins])
+ve/create ym([ndelbins])
+ve/create delb([ndelbins])
+ve/create ratth([nthbins])
+ve/create eratth([nthbins])
+ve/create therrd([nthbins])
+ve/create therrm([nthbins])
+ve/create thb([nthbins])
+ve/create kin2(5)
+
+mess [datalun]
+
+do i = 1,[ndelbins]
+ dppicent = [i]*[delwidth]-[delmax]-[delwidth]/2.
+
+ mess [i] [dppicent]
+
+ kuip/sh rm ../output/data/cskin.dat
+ etemp = [hsec]*(1.+[dppicent]/100.)
+ thetactemp = 180.*[thetac]/3.14159
+ ve/input kin2(1) [ebeam]
+ ve/input kin2(2) [etemp]
+ ve/input kin2(3) [thetactemp]
+ ve/input kin2(4) [targetnum]
+ ve/input kin2(5) [useant]
+ vec/write kin2  ../output/data/cskin.dat '4x,5f10.4' 'OC'
+ kuip/sh rm ../output/data/csmod.dat
+ kuip/sh ./../../callmod
+ ve/read sigtemp ../output/data/csmod.dat
+ ve/input sigmod([i]) sigtemp(3) 
+ ve/input eprime([i]) [etemp]
+ ve/input ebeamv([i]) [ebeam]
+ ve/input thetav([i]) [thetactemp]
+enddo
+
+ ve/create delcor([ndelbins])
+
+APPlication COMIS QUIT 
+
+vector tmpvect
+vector delcor(20)
+write(6,*) tmpvect
+*a0 = 1.004
+a0 = 1.009175
+a1 = 0.4260E-02
+a2 = -0.8603E-03
+a3 = -0.10942E-03
+a4 = 0.12697E-04
+a5 = 0.1094E-07
+
+*do i=1,16
+* dppc = i*1.-8.5
+ncomisbins = int(tmpvect(2))
+delmax = tmpvect(1)+.5
+write(6,*) delmax
+do i=1,ncomisbins
+ dppc = i*1.-delmax
+ delcor(i) = a0+a1*dppc+a2*dppc**2+a3*dppc**3+a4*dppc**4+a5*dppc**5
+*  write(*,*) dppc,delcor(i)
+
+enddo
+end 
+quit
+
+if [usedelcor] = 0 then
+  sigma delcor = delcor*0. + 1.
+endif
+
+sigma delcor = 1./delcor
+
+ve/print sigmod 
+ve/print eprime
+ve/print delcor
+
+/HISTOGRAM/PUT_VECT/CONTENTS '770' 'delcor'
+
+
+ntu/pl //LUN20/[datalun].hsytar $33 20000000 1 20000000 ' ' 360
+ntu/pl //LUN20/[datalun].hsdelta $33 20000000 1 20000000 ' ' 500
+ndata = $HINFO(500,'SUM')
+
+*ntu/pl //LUN20/[datalun].w2 $33 20000000 1 20000000 ' ' 540
+ntu/pl //LUN20/[datalun].[w2d] $33 20000000 1 20000000 ' ' 540
+ntu/pl //LUN20/[datalun].(1000.*hsyptar) $33 20000000 1 20000000 ' ' 510
+ntu/pl //LUN20/[datalun].(1000.*hsxptar) $33 20000000 1 20000000 ' ' 520
+ntu/pl //LUN20/[datalun].((hstheta-[thetac])*1000.) $33 20000000 1 20000000 ' ' 530
+***   Use raw yield for errors  ***
+ntu/pl //LUN30/9040.dppr $40 2000000 1 2000000 ' ' 400
+/HISTOGRAM/GET_VECT/CONTENTS '400' 'errm'
+***********************************
+/HISTOGRAM/GET_VECT/CONTENTS '500' 'errd'
+
+ntu/pl //LUN30/9040.dthr $40 2000000 1 2000000 ' ' 430
+/HISTOGRAM/GET_VECT/CONTENTS '430' 'therrm'
+***********************************
+/HISTOGRAM/GET_VECT/CONTENTS '530' 'therrd'
+
+
+
+sigma errd = 1./sqrt(errd)
+sigma errm = 1./sqrt(errm)
+sigma therrd = 1./sqrt(therrd)
+sigma therrm = 1./sqrt(therrm)
+
+
+*ve/print errd
+*ve/print errm
+
+hi/copy 540 440
+ntu/pl //LUN30/9040.[w2mc] $40.AND.born/rci/rce*csback*[mcscale] 2000000 1 2000000 ' ' 440
+*ntu/pl //LUN30/9040.w2 $40.AND.born/rci/rce*csback*[mcscale] 2000000 1 2000000 ' ' 440
+ntu/pl //LUN30/9040.(yrec+[dy]) $40.AND.born/rci/rce*csback*[mcscale] 2000000 1 2000000 ' ' 460
+ntu/pl //LUN30/9040.dppr $40.AND.born/rci/rce*csback*[mcscale] 2000000 1 2000000 ' ' 400
+ntu/pl //LUN30/9040.[dthrc] $40.AND.born/rci/rce*csback*[mcscale] 2000000 1 2000000 ' ' 410
+ntu/pl //LUN30/9040.[dphrc] $40.AND.born/rci/rce*csback*[mcscale] 2000000 1 2000000 ' ' 420
+ntu/pl //LUN30/9040.(([dt])*1000.) $40.AND.born/rci/rce*csback*[mcscale] 2000000 1 2000000 ' ' 430
+
+nmc =  $HINFO(400,'SUM')
+scalemc = [ndata]/[nmc]
+mess ndata = [ndata], nmc = [nmc] 
+mess Average MC scale factor is:  [scalemc]
+
+*****   Scale MC histograms with average MC scale factor   *****
+
+HI/OPERATIONS/ADD  400 400 400 [scalemc] 0
+HI/OPERATIONS/ADD  410 410 410 [scalemc] 0
+HI/OPERATIONS/ADD  420 420 420 [scalemc] 0
+HI/OPERATIONS/ADD  430 430 430 [scalemc] 0
+HI/OPERATIONS/ADD  440 440 440 [scalemc] 0
+HI/OPERATIONS/ADD  460 460 460 [scalemc] 0
+
+*****    Put remaining bin-by-bin MC scale factor in histogram 600      *****
+
+hi/op/divide 500 400 600
+
+*****   Apply optics correction to data in delta (delcor in hist 770)   *****
+
+hi/op/divide   400 770 870 1. 1.
+
+*****   Get residual bin-by-bin MC scale factor in delta (in hist 670)  *****
+
+hi/op/divide   500 870 670 1. 1.
+
+
+/HISTOGRAM/GET_VECT/CONTENTS  500  yd
+/HISTOGRAM/GET_VECT/CONTENTS  870  ym
+/HISTOGRAM/GET_VECT/ABSCISSA  870  delb
+
+
+hi/op/divide 530 430 930
+hi/op/divide 500 400 600
+hi/op/divide 500 400 900
+
+
+/HISTOGRAM/GET_VECT/CONTENTS  930  ratth
+/HISTOGRAM/GET_VECT/ABSCISSA  930  thb
+ 
+set hwid 3.
+*zone 2 3
+zone 2 4
+ 
+**  ytar  **
+ set hcol 1005
+ hi/pl 460 
+ set hcol 1
+ hi/pl 460 s
+ set hcol 4
+ set pmci 4
+ hi/pl 360 es
+ ATitle 'Y target (cm)' ' ' ! 222
+ 
+ 
+**  yptar  **
+ 
+ set hcol 1005
+ hi/pl 410 
+ set hcol 1
+ hi/pl 410 s
+ set hcol 4
+ set pmci 4
+ hi/pl 510 es
+ 
+ ATitle 'Y^/! target (mrad)' ' ' ! 222
+ 
+ 
+**  xptar  **
+
+ set hcol 1005
+ hi/pl 420 
+ set hcol 1
+ hi/pl 420 s
+ set hcol 4
+ set pmci 4
+ hi/pl 520 es
+ 
+ ATitle 'X^/! target (mrad)' ' ' ! 222
+  
+**  delta  **
+ set hcol 1005
+ hi/pl 400 
+ set hcol 1
+ hi/pl 400 s
+ set hcol 4
+ set pmci 4
+ hi/pl 500 es
+ 
+ ATitle '[d]p/p ("Y#)' ' ' ! 222
+
+**  dTheta  **
+ 
+ set hcol 1005
+ hi/pl 430 
+ set hcol 1
+ hi/pl 430 s
+ set hcol 4
+ set pmci 4
+ hi/pl 530 es
+ 
+ ATitle '[Q] - [Q]?c! (mrad)' ' ' ! 222
+
+
+**  W2  **
+ 
+ set hcol 1005
+ hi/pl 440 
+ set hcol 1
+ hi/pl 440 s
+ set hcol 4
+ set pmci 4
+ hi/pl 540 es
+ 
+ ATitle 'W^2! (GeV^2!)' ' ' ! 222
+ 
+**  dtheta  **
+ 
+ set plci 2
+ set hcol 1005
+ hi/pl 930 
+ set hcol 1
+ hi/pl 930 s
+ /GRAPHICS/PRIMITIVES/LINE '-35' '1.' '35' '1.'
+ 
+ ATitle '[Q] - [Q]?c! (mrad)  (Ratio Data/MC)' ' ' ! 222
+ 
+ 
+**
+ 
+ set plci 1
+
+
+ ndeli = $HINFO(900,'SUM')
+ ndelcor = $HINFO(930,'SUM')
+
+ mess [ndeli] [ndelcor]
+
+ printfile = ../output/plots/mccomp[runnum].ps
+
+if [fpcuts] = 1 then
+ printfile = ../output/plots/mccomp[runnum]_fpcuts.ps
+ filename = ../output/data/sigma[runnum]_fpcuts.dat
+endif
+
+ set hcol 2
+*hi/pl 670 e
+
+ sigma error2 = errd*0.
+ sigma therr2 = therrd*0.
+*sigma eratth = ratth*sqrt(therrd*therrd+therrm*therrm)
+ sigma eratth = sqrt(therrd*therrd+therrm*therrm)
+
+ sigma ratdel = yd/ym
+ sigma errrat = ratdel*sqrt(errd*errd+errm*errm)
+ null [delmin] [delmax] 0.9 1.1
+ set hcol 4
+ 
+ hplot/errors  delb ratdel error2 errrat 500 22 .25 
+ ATitle '[d]p/p ("Y#)  (Ratio Data/MC)' ' ' ! 222
+ set plci 1
+ scale2 = 1./[scalemc]
+ set plci 2
+ /GRAPHICS/PRIMITIVES/DLINE   [delmin] [delmax] 1.0 1.0
+ scale98 = .98
+ scale102 = 1.02
+ set ltyp 2
+ /GRAPHICS/PRIMITIVES/DLINE  [delmin] [delmax] [scale98] [scale98]
+ /GRAPHICS/PRIMITIVES/DLINE  [delmin] [delmax] [scale102] [scale102]
+ set ltyp 1 
+ set plci 1
+ 
+ tit = Run = [runnum],  Target = [targetnum] 
+ kin = E = [ebeam],  E^</>! = [hsec],  [Q] = [thetactemp] 
+ scaletext = MC scale = [scalemc]
+
+ TEXT -22 2.28 [tit] .4 0. L
+ TEXT -25 2.21 [kin] .4 0. L
+ *TEXT  -7 1.66  [scaletext] .35 0. L
+ TEXT  -24 0.95  [scaletext] .35 0. L
+ 
+ set ltyp 1
+ 
+ set plci 1
+ key -23 1.68 1 'MC' 1.0 L
+ set pmci 4
+ key -23 1.72 22  'DATA'
+ set plci 1
+ set pmci 1
+ 
+ 
+*/ve/fit delb ratdel errrat p0 s
+
+ ve/print errrat
+
+* vec/write ratdel errrat [file2] '3x5f13.4' 'OC'
+* vec/write kin2 ../output/data/cskin.dat '4x,5f10.4' 'OC'
+
+ /hi/GET_VECT/CONTENTS  600 scale
+ /hi/GET_VECT/CONTENTS  670 scale1
+*sigma sigdata = scale*sigmod
+sigma sigdata = [scalemc]*scale1*sigmod
+sigma errdata = errrat*sigdata
+sigma w2 = [mp2]+2.*[mp]*(ebeamv-eprime)
+sigma sin = sin(3.1416/180.*thetav/2.)*sin(3.1416/180.*thetav/2.) 
+sigma w2 = w2-4.*ebeamv*eprime*sin2
+ ve/print sigdata
+ vec/write ebeamv,eprime,thetav,w2,sigdata,errdata,sigmod [filename] '4x,7f13.4' 'OC'
+
+ vec/write delb,ratdel,errrat [file2] '3f13.4' 'OC'
+
+*hi/fit 600 p4
+
+ /PICTURE/PRINT [printfile] '0' '0'
+*/PICTURE/PRINT [printfile2] '0' '0'
+
+set hwid 5
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

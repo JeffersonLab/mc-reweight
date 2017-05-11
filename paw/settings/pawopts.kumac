@@ -1,0 +1,28 @@
+**  Configure PAW options  **
+
+ set ncol 8
+ opt nbox
+ opt nstat
+ opt nfil
+ opt utit     ** user title
+ set fais 3
+ set fasi 3
+ set faci 5
+ set npass 3
+ set ywin 2.0
+ set xlab 1.9
+ set ylab 0.95
+ set xmgl 2.5
+ set xmgr 2.5
+ set xsiz 25.
+ set csiz 0.35
+ set lwid 5.
+ set hwid 5.
+ set mtyp 22
+ set pmci 4
+ set plci 1
+ set barw 0.3
+ set mscf 1.0    **  vector marker scale factor  **
+ set ksiz 0.185  **  histogram marker scale factor  **
+ set asiz 0.4
+ set tsiz 0.4
