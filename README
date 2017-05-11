@@ -109,6 +109,10 @@ A plot of the comparisons will be printed to a postscript file called
 \ Eric P.'s README
 \--\--\--\--\--\--\
 
+In order to run the example, you will need to copy the file /scratch/pooser/input.tar.gz
+into the top level directory and unpack it via. tar -xvf input.tar.gz.  
+This will overwrite your current input directory however, it will maintain the structure.
+
 /--/--/--/--/--/--/--/
 / Directroy structure
 /--/--/--/--/--/--/--/
