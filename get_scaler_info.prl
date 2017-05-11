@@ -26,8 +26,7 @@ my $pwd = cwd();
 # PUT THE PATH OF YOUR SCALER DIRECTORY HERE
 #my $scalerpath  = "/work/hu/disk2/Tvaskis/E02-109_E04-001/Analyzer/replay/scalers/";
 #my $scalerpath  = "/lustre/expphy/work/hallc/rosen07tmp/simona/pass3/scalers/";
-my $scalerpath  = "$pwd/input/reports/";
-
+my $scalerpath = "/lustre/expphy/work/hallc/shms/pooser/mc-reweight/input/reports/";
 
 my $genfilename = join "", $scalerpath, "gen", $runno, ".txt";
 

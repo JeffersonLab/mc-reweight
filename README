@@ -120,6 +120,9 @@ via. tar -xvf /scratch/pooser/input.tar.gz.  This will overwrite your
 current input directory however, it will maintain the structure and fill the 
 directories with the input files needed to run the example.
 
+Prior to running the example you MUST define the explicit location of the report file gen53214.txt
+in the perl script get_scaler_info.prl at line 29.  This should be fixed!
+
 To run the example in place simply do:
 cd SRC
   make
