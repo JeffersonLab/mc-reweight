@@ -1,0 +1,14 @@
+SRC/*.o
+*.rzdat
+*.dat
+*.tbl*
+fort.55
+*.ps
+*.metafile
+*.in
+*.log
+*.txt
+*.in
+recon_mc
+*~
+callmod
