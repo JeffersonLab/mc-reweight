@@ -115,10 +115,12 @@ which has been customized to work in this particular framework and the paw macro
 used to make histograms. 
 
 In order to run the example on the ifarm, you will need to unpack the 
-file /scratch/pooser/input.tar.gz in the top level directory 
-via. tar -xvf /scratch/pooser/input.tar.gz.  This will overwrite your 
-current input directory however, it will maintain the structure and fill the 
-directories with the input files needed to run the example.
+file /u/group/hallc/pooser/mc-reweight-example-data/input.tar.gz in 
+the top level directory via. the command:
+tar -xvf /u/group/hallc/pooser/mc-reweight-example-data/input.tar.gz 
+This will overwrite your current input directory however, it will maintain 
+the structure and fill the directories with the input files needed 
+to run the example.
 
 Prior to running the example you MUST define the explicit location of the report file gen53214.txt
 in the perl script get_scaler_info.prl at line 29.  This should be fixed!
