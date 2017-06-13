@@ -351,10 +351,10 @@ c         write(6,*) xfoc,dydz,yptarrec,ypcor
 
          yptarrec = yptarrec-ypcor 
 
-         thetaini = acos(cos(thetacrad-yptarini)
+         thetaini = acos(cos(thetacrad+yptarini)
      &              *cos(xptarini))             
       
-         hstheta = acos(cos(thetacrad-yptarrec)
+         hstheta = acos(cos(thetacrad+yptarrec)
      &              *cos(xptarrec))
 
 
