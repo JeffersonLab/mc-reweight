@@ -7,12 +7,10 @@ TDirectory *mcRawDir, *mcWgtDir, *dataDir;
 // Declare trees
 TTree *mcRawTree, *mcWgtTree, *dataTree;
 // Declare text data files
-ifstream reconDataFile, inputDataFile, targetDataFile;
+ifstream reconDataFile;
 // Declare variables
 // Input text file data
 Float_t target, E0, P, theta, psFactors, bcm1, bcm2, q1, q2, clt, elt, trackEff, tofEff, trigEff;
-Float_t numEvents, phiRange, thetaRange, dPMax, dPmin, chargeSymmFlag, radCorrFlag;
-Float_t tarID, tarDensity, tarThickness, tarAtomicMass, tarAtomicNum, tarArealDensity;
 // Number of entries
 Int_t    nEntriesMCRaw, nEntriesMCWgt, nEntriesData;
 // Leaf variables
@@ -74,20 +72,11 @@ void mc_reweight() {
   dataTree  = dynamic_cast <TTree*> (dataFile->Get("T"));
   // Open the data text files
   reconDataFile.open("../../input/recon-mc/kpp_shms_488_recon.in");
-  inputDataFile.open("../../input/recon-mc/kpp_shms_488_input_root.dat");
-  targetDataFile.open("../../input/target/kpp_shms_488_target.dat");
-  // Obtain data from the input files
+  // Obtain data from the input file
   reconDataFile >> target >> E0 >> P >> theta >> psFactors >> bcm1 >> bcm2 
 		>> q1 >> q2 >> clt >> elt >> trackEff >> tofEff >> trigEff;
-  inputDataFile >> numEvents >> phiRange >> thetaRange >> dPMax >> dPmin 
-		>> chargeSymmFlag >> radCorrFlag;
-  targetDataFile >> tarID >> tarDensity >> tarThickness >> tarAtomicMass 
-		 >> tarAtomicNum >> tarArealDensity;
-  // Close the data text files
-  reconDataFile.close(); inputDataFile.close(), targetDataFile.close();
-  // cout << target << "\t" << E0 << "\t" << P  << "\t" << theta  << endl;
-  // cout << numEvents << "\t" << phiRange << "\t" << thetaRange << endl;
-  // cout << tarID << "\t" << tarDensity << "\t" << tarThickness << endl;
+  // Close the data text file
+  reconDataFile.close();
 
   // Acquire the number of entries for each tree, and calculate scale factor
   nEntriesMCRaw = mcRawTree->GetEntries();
