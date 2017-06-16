@@ -10,15 +10,16 @@
 	integer	nwpawc
 	real	memor
         integer lrecl,nevt,ievt,ierr,istat
-        real*4 ntuple_contents(17),xfoc,dydz,ypcor
+        real*4 ntuple_contents(21),xfoc,dxdz,yfoc,dydz,ypcor
         real*4 hse,hsp,hsec,hsev,eb,thetactemp,ebeam,radcon,thetac
         real*4 thetacrad,mp,mp2,nu,sin2,q2,w2,rcic,rcib,rcec
         real*4 rceb,trad,targetdata(6),eff_cal,eff_cer,emc
         real*4 pie,bcm1charge,bcm2charge,gbcm1charge,hpre,edt
         real*4 bcmavecharge,bmcur1,bmcur2,bmcur,eltime,cltime2
         real*4 positron_weight,posal,born,rci,rce,delup,deldown
-        real*4 delini,ytarini,yptarini,xptarini,zini,thetaini
+        real*4 delini,xtarini,ytarini,yptarini,xptarini,ztarini,thetaini
         real*4 delrec,ytarrec,yptarrec,xptarrec,zrec,thetarec
+	real*4 xstop,ystop
         real*4 w,normfac,charge,ydata,lumfract,sigmacent,sigmac
         real*4 lumdata,lummc,fract,sigave,sigtot,dxp,dyp,dep
         real*4 prescale,cltime,trackeff,trigeff,xpup,ypup,dtup,hstheta
@@ -35,7 +36,7 @@
         logical firstr,ron,goodfit,newrc,cryo,docs,dorc,use_rcmod
 
         parameter (nwpawc=500000)
-        parameter (nentries = 26)        
+        parameter (nentries = 30)        
         parameter(bank = 1000)
         parameter(title = 'RECONTUPLE')
         character*80 NtupleTag(nentries)
@@ -72,7 +73,9 @@ c        use_rcmod = .false.
         mp2 = mp*mp
 
         read(5,*) runnum
-        write(outfile,'("output/mc-ntuples/mc",i5,".rzdat")')runnum
+c        write(outfile,'("mc",i5,".rzdat")')runnum
+        write(outfile,'("output/mc-ntuples/mc",i3,".rzdat")')runnum
+c        open(unit=18, file='input.dat',status='old') 
         open(unit=18, file='mc_input.dat',status='old') 
         read(18,*) infile,maxev,dxp,dyp,delup,deldown,cs_flag,rc_flag
 
@@ -89,15 +92,16 @@ CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 
 CCCCCC      Read run info from database for data           CCCCCCC
 
+c        open(unit=16,file='reconmc.in',status='old')
         open(unit=16,file='input/recon-mc/reconmc.in',status='old')
 
         read(16,*) target,ebeam,hsec,thetac,prescale,bmcur1,bmcur2,
-     &            bcm1charge,bcm2charge,cltime,eltime,trackeff,
-     &            hmstof,hms34,hmsprlo,rate
+     &        bcm1charge,bcm2charge,cltime,eltime,trackeff,trigeff,rate
+c     &            hmstof,hms34,hmsprlo,rate
 
 c        hmsprlo = 1.0   !!!!*****  TEST  *****!!!!
 
-        trigeff = hmsprlo*hmstof + (1. - hmsprlo)*hms34
+c        trigeff = hmsprlo*hmstof + (1. - hmsprlo)*hms34
 
 
         if(target.NE.11.OR.target.NE.15) cryo = .false.
@@ -140,6 +144,7 @@ CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 
 CCCCCC        Read in target data from file                CCCCCCC
 
+c        open(unit=17, file='targetdata.dat',status='old') 
         open(unit=17, file='input/target/targetdata.dat',status='old') 
         do i=1,target
           read(17,*) targetdata
@@ -189,11 +194,11 @@ c        ebeam = ebeam*(1.+.001)
         new = 'N'
         istat = 0
 
-	call hropen (1, 'MCntuple', infile, ' ',ntrecl,istat) 
+	call hropen (1, 'MCntuple', infile, ' ',1024,istat) 
         call HCDIR(directory,'R')
 
-        call hgnpar (1, 'readdat') 
-        call hnoent (1, nevt)  
+        call hgnpar (1411, 'readdat') 
+        call hnoent (1411, nevt)  
         call HCDIR(directory,'R') 
         write(6,*) '               Old ntuple is: ', infile
         call HLDIR(' ',' ')
@@ -205,36 +210,44 @@ c        ebeam = ebeam*(1.+.001)
         m = m+1
         NtupleTag(m) = 'yfoc'
         m = m+1 
-        NtupleTag(m) = 'dydz'
-        m = m+1
         NtupleTag(m) = 'dxdz'
         m = m+1
-        NtupleTag(m) = 'zini'
+        NtupleTag(m) = 'dydz'
         m = m+1
+        NtupleTag(m) = 'ztarini'
+        m = m+1
+        NtupleTag(m) = 'yini'
+        m = m+1	
         NtupleTag(m) = 'dppi'
         m = m+1
-        NtupleTag(m) = 'dthi'
+        NtupleTag(m) = 'yptarini'
         m = m+1
-        NtupleTag(m) = 'dphi'
+        NtupleTag(m) = 'xptarini'
         m = m+1
         NtupleTag(m) = 'zrec'
         m = m+1
+        NtupleTag(m) = 'yrec' 
+        m = m+1 
         NtupleTag(m) = 'dppr' 
         m = m+1
-        NtupleTag(m) = 'dthr' 
+        NtupleTag(m) = 'yprec' 
         m = m+1
-        NtupleTag(m) = 'dphr' 
+        NtupleTag(m) = 'xprec' 
         m = m+1
-        NtupleTag(m) = 'fail_id'
-        m = m+1  
+        NtupleTag(m) = 'xtarini'
+	m = m+1
+        NtupleTag(m) = 'yrast' 
+        m = m+1
+        NtupleTag(m) = 'xsnum' 
+        m = m+1
+        NtupleTag(m) = 'ysnum' 
+        m = m+1
         NtupleTag(m) = 'x_stop'
         m = m+1 
         NtupleTag(m) = 'y_stop' 
         m = m+1 
-        NtupleTag(m) = 'yini'
-        m = m+1
-        NtupleTag(m) = 'yrec' 
-        m = m+1 
+        NtupleTag(m) = 'fail_id'
+        m = m+1  
         NtupleTag(m) = 'born'
         m = m+1
         NtupleTag(m) = 'rci'
@@ -283,17 +296,24 @@ c        ebeam = ebeam*(1.+.001)
          endif 
  
          xfoc = ntuple_contents(1)
-         dydz = ntuple_contents(3)
-         delini = ntuple_contents(6)          
-         yptarini = ntuple_contents(7)
-         xptarini = ntuple_contents(8)
-         zrec = ntuple_contents(9)
-         delrec = ntuple_contents(10)
-         yptarrec = ntuple_contents(11) 
-         xptarrec = ntuple_contents(12)
-         fail_id = ntuple_contents(13)
-         ytarini = ntuple_contents(16)
-         ytarrec = ntuple_contents(17) 
+	 yfoc = ntuple_contents(2)
+         dxdz = ntuple_contents(3)
+	 dydz = ntuple_contents(4)
+	 ztarini = ntuple_contents(5)
+	 ytarini = ntuple_contents(6) 
+         delini = ntuple_contents(7)          
+         yptarini = ntuple_contents(8)
+         xptarini = ntuple_contents(9)
+         zrec = ntuple_contents(10)
+	 ytarrec = ntuple_contents(11) 
+         delrec = ntuple_contents(12)
+         yptarrec = ntuple_contents(13) 
+         xptarrec = ntuple_contents(14)
+	 xtarini = ntuple_contents(15)
+	 xstop = ntuple_contents(19)
+         ystop = ntuple_contents(20)
+         fail_id = ntuple_contents(21)
+c         fail_id = 0
 
 
          hse = hsec*(1.+delini/100.)
@@ -312,7 +332,7 @@ c         ebeam = eb + (emean - de)/1000.
 c         call samp_eloss(1.0,1.0,0.511,thick,ex,hse*1000.,emean,de)
 c         hsev = hse + de/1000.         
 c         hse = hse + emean/1000.  
-          hsev = hse
+         hsev = hse
 
 c         write(6,*) hse,emean,de
 
@@ -323,7 +343,7 @@ c         xptarrec = xptarrec - 0.69
 c         yptarini = yptarini - 0.90    !!!!!!   Test
 c         xptarini = xptarini - 0.69
 
-         call yp_optcor(xfoc,dydz*1000.,ypcor)
+c         call yp_optcor(xfoc,dydz*1000.,ypcor)
 
          ypcor = 0.0
 
@@ -331,13 +351,16 @@ c         write(6,*) xfoc,dydz,yptarrec,ypcor
 
          yptarrec = yptarrec-ypcor 
 
-         thetaini = acos(cos(thetacrad-yptarini/1000.)
-     &              *cos(xptarini/1000.))             
+         thetaini = acos(cos(thetacrad+yptarini)
+     &              *cos(xptarini))             
       
-         hstheta = acos(cos(thetacrad-yptarrec/1000.)
-     &              *cos(xptarrec/1000.))
+         hstheta = acos(cos(thetacrad+yptarrec)
+     &              *cos(xptarrec))
 
 
+c         write(6,*) thetaini,hstheta,thetacrad,yptarini,hsec,hse
+
+	 
 CCCCCCC    Calculate the vertex kinematics for the event    CCCCCCCCC
 
  
@@ -356,6 +379,8 @@ CCCCCCC           Get Model Cross section in nb/SR/GeV           CCCCCCCCC
          if(use_rcmod) then
            call rc_mod(firstr,thetaini,thetacrad,hsev,1,t1,born)
            call rc_mod(firstr,thetacrad,thetacrad,hsev,1,t1,sigmac)
+	   if(nu.LT.0.015.AND.w2.LT.0.84) born = 0.0
+	   
          else
            call model_new(ebeam,hsev,thetaini,target,born)      !!!   For actual angle     !!!
            call model_new(ebeam,hsev,thetacrad,target,sigmac)   !!!   For central angle    !!!
@@ -369,7 +394,7 @@ c          phasespcor = 1.
 
 c          write(6,*) dt,phasespcor
  
-c         write(6,*) ebeam,hse,thetaini,target,born
+c         write(6,*) ebeam,hsev,thetaini,target,born
 
 c         write(6,*) xb,AA,emc
 
@@ -381,30 +406,16 @@ c         write(6,*) xb,AA,emc
 
 !!!!!!!   Apply delcor :  7/09/02
        
-          delcor =  1.009+.4260E-02*delrec-.8603E-03*delrec*
-     &       delrec-.10942E-03*delrec*delrec*delrec+.12697E-04*
-     &       delrec*delrec*delrec*delrec+.1094E-07*delrec*
-     &       delrec*delrec*delrec*delrec
-
-c          delcor =  1.0077+.4707E-02*delrec-.84067E-03*delrec*
-c     &       delrec-.16119E-03*delrec*delrec*delrec+.13636E-04*
-c     &       delrec*delrec*delrec*delrec+.64174E-06*delrec*
+c          delcor =  1.009+.4260E-02*delrec-.8603E-03*delrec*
+c     &       delrec-.10942E-03*delrec*delrec*delrec+.12697E-04*
+c     &       delrec*delrec*delrec*delrec+.1094E-07*delrec*
 c     &       delrec*delrec*delrec*delrec
-
-
-
-          if(delrec.GT.-10.0.AND.delrec.LT.-9.0) delcor=delcor/1.04
-c          if(delrec.GT.-10.0.AND.delrec.LT.-9.0) delcor=1.00
-          if(delrec.GT.-9.0.AND.delrec.LT.-8.0) delcor=delcor/0.99
-c          if(delrec.GT.-9.0.AND.delrec.LT.-8.0) delcor=1.00
-c          if(delrec.GT.-6.0.AND.delrec.LT.-5.0) delcor=delcor/1.012
-          if(delrec.GT.9.0.AND.delrec.LT.10.0) delcor=delcor/0.99
 
 c          write(6,*) delrec,delcor
 
 CCCCC      Turn delta correction off    CCCCC
 
-c          delcor = 1. 
+          delcor = 1. 
 
 
 CCCCCCC   Now Get RC corrections for event    CCCCCCCC
@@ -412,6 +423,8 @@ CCCCCCC   Now Get RC corrections for event    CCCCCCCC
          if(newrc) then
           call rc_mod(firstr,thetaini,thetacrad,hsev,1,rci,t1)
           rce = 1.
+c	  if(nu.LT.0.015.AND.w2.LT.0.84) rci = 0.0
+
           if(target.EQ.1.AND.w2.LT.1.18) then
 c           rci = 1.
 c           rce = 1.
@@ -420,13 +433,13 @@ c           rce = 1.
           call rcint(firstr,thetaini,thetacrad,hsev,target,rci)
           call rcext(firstr,thetaini,thetacrad,hsev,target,rce)
           if(w2.LT.1.18) then 
-           rci = 1.
-           rce = 1.
+c           rci = 1.
+c           rce = 1.
           endif
          endif         
          if(.not.dorc) then
-           rci = 1.
-           rce = 1.
+          rci = 1.
+          rce = 1.
          endif
         
 
@@ -459,13 +472,17 @@ CCCCCCC    Calculate positron background weight.     CCCCCCCCC
          positron_weight = 1.+poscs/(born/rci/rce)
          if(.not.docs) positron_weight = 1.
 
+c         write(6,*),born,phasespcor,delcor
+	 
 CCCCCCC            Fill new Ntuple                   CCCCCCCCC
 
-         do j = 1, 17
+         do j = 1, 20
           ntu(j) = ntuple_contents(j)
          enddo
            
-         j = 18
+         j = 21
+	 ntu(j) = fail_id
+	 j = j+1
          ntu(j) = born*phasespcor*delcor
          j = j+1
          ntu(j) = rci
@@ -483,10 +500,10 @@ CCCCCCC            Fill new Ntuple                   CCCCCCCCC
          ntu(j) = q2
          j = j+1
          ntu(j) = w2
-         ntu(7) = yptarini
-         ntu(8) = xptarini 
-         ntu(11) = yptarrec 
-         ntu(12) = xptarrec
+c         ntu(7) = yptarini
+c         ntu(8) = xptarini 
+c         ntu(11) = yptarrec 
+c         ntu(12) = xptarrec
 
          call hcdir('//reconmc',' ') 
          call HFN(9040,ntu)
