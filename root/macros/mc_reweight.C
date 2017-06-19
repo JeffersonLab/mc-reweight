@@ -52,8 +52,9 @@ TH2F *h2_xpVyFocalData, *h2_xpVypFocalData, *h2_yVypFocalData;
 TH2F *h2_yVxpTarData, *h2_yVypTarData, *h2_xpVypTarData;
 // Declare constants
 static const Double_t protonMass    = 0.938272;  // GeV
-static const Double_t mcScaleFactor = 1.75554138E-02;  // Output from recon_mc.f
+static const Double_t mcScaleFactor = 1.75593104E-02;  // Output from recon_mc.f
 static const Double_t rad2mrad      = 1000.0;
+//static const Double_t fudgeFactor   = 14.0;  // Arbitrary scaling factor
 static const Double_t fudgeFactor   = 14.0;  // Arbitrary scaling factor
 // Define functions to calculate kinematic variables
 Double_t calc_q2(Double_t beamEnergy, Double_t scatMom, Double_t scatAngle);
@@ -251,7 +252,7 @@ void mc_reweight() {
     // Define and implement cuts
     Bool_t failIDCut = failID == 0.0;
     if (!failIDCut) continue;
-    Bool_t deltaPCut = TMath::Abs(deltaMCWgt - 5.0) < 20.0;
+    Bool_t deltaPCut = TMath::Abs(deltaMCWgt - 5.0) < 15.0;
     if (!deltaPCut) continue;
     // Caluclate the scale factor
     scaleFactor = (bornCS * mcScaleFactor) / (fudgeFactor * intRadCorr);
@@ -296,7 +297,7 @@ void mc_reweight() {
     // Tracking cuts
     Bool_t gtrOkCut   = gtrOkData == 1.0;
     Bool_t gtrBetaCut = TMath::Abs(gtrBetaData - 1.0) < 0.2;
-    Bool_t deltaPCut  = TMath::Abs(deltaData - 5.0) < 20.0;
+    Bool_t deltaPCut  = TMath::Abs(deltaData - 5.0) < 15.0;
     Bool_t trackCuts  = gtrOkData && gtrBetaCut && deltaPCut;
     //Bool_t trackEnergyNormCut = TMath::Abs(trackEnergyNorm - 1.1) < 0.3;
     //Bool_t trackCuts          = numTracksCut && goldTrackBetaCut && trackEnergyNormCut;
