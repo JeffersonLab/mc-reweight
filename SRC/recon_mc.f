@@ -35,7 +35,7 @@
 	integer	i, m, NtupleSize, bank,ngen,ntrecl,cs_flag,rc_flag
         logical firstr,ron,goodfit,newrc,cryo,docs,dorc,use_rcmod
 
-        parameter (nwpawc=500000)
+        parameter (nwpawc=5000000)
         parameter (nentries = 30)        
         parameter(bank = 1000)
         parameter(title = 'RECONTUPLE')
@@ -194,7 +194,7 @@ c        ebeam = ebeam*(1.+.001)
         new = 'N'
         istat = 0
 
-	call hropen (1, 'MCntuple', infile, ' ',1024,istat) 
+	call hropen (1, 'MCntuple', infile, ' ', 4096,istat) 
         call HCDIR(directory,'R')
 
         call hgnpar (1411, 'readdat') 

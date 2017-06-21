@@ -69,6 +69,8 @@ static const Double_t w2YMax     = 450.0;
 static const Double_t idealRatio = 1.0;
 static const Double_t ratioMin   = 0.0;
 static const Double_t ratioMax   = 2.0;
+// Scale factor for MC events to match data
+static const Double_t scaleFactor = 1.5;
 
 
 void compPlots() {
@@ -121,12 +123,15 @@ void compPlots() {
   c_tarComp = new TCanvas("c_tarComp", "Comparison of Target Variables", canWidth, canHeight); 
   c_tarComp->Divide(3, 2);
   c_tarComp->cd(1);
+  h_xpTarMCWgt->Scale(scaleFactor);
+  h_xpTarMCWgt->SetOption("HIST");
   h_xpTarMCWgt->SetFillColor(8);
+  h_xpTarMCWgt->SetLineColor(8);
   h_xpTarMCWgt->SetFillStyle(3001);
   h_xpTarMCWgt->GetXaxis()->SetRangeUser(xpTarXMin, xpTarXMax);
   h_xpTarMCWgt->GetYaxis()->SetRangeUser(xpTarYMin, xpTarYMax);
   h_xpTarMCWgt->SetTitle("Weighted MC to Data Comparison: X'_{tar}");
-  h_xpTarMCWgt->Draw("B");
+  h_xpTarMCWgt->Draw();
   h_xpTarData->SetMarkerColor(4);
   h_xpTarData->SetMarkerStyle(22);
   h_xpTarData->Draw("E, SAME");
@@ -136,12 +141,15 @@ void compPlots() {
   l_xpTarComp->Draw();
 
   c_tarComp->cd(2);
+  h_ypTarMCWgt->Scale(scaleFactor);
+  h_ypTarMCWgt->SetOption("HIST");
   h_ypTarMCWgt->SetFillColor(8);
+  h_ypTarMCWgt->SetLineColor(8);
   h_ypTarMCWgt->SetFillStyle(3001);
   h_ypTarMCWgt->GetXaxis()->SetRangeUser(ypTarXMin, ypTarXMax);
   h_ypTarMCWgt->GetYaxis()->SetRangeUser(ypTarYMin, ypTarYMax);
   h_ypTarMCWgt->SetTitle("Weighted MC to Data Comparison: Y'_{tar}");
-  h_ypTarMCWgt->Draw("B");
+  h_ypTarMCWgt->Draw();
   h_ypTarData->SetMarkerColor(4);
   h_ypTarData->SetMarkerStyle(22);
   h_ypTarData->Draw("E, SAME");
@@ -151,12 +159,15 @@ void compPlots() {
   l_ypTarComp->Draw();
 
   c_tarComp->cd(3);
+  h_deltaMCWgt->Scale(scaleFactor);
+  h_deltaMCWgt->SetOption("HIST");
   h_deltaMCWgt->SetFillColor(8);
+  h_deltaMCWgt->SetLineColor(8);
   h_deltaMCWgt->SetFillStyle(3001);
   h_deltaMCWgt->GetXaxis()->SetRangeUser(deltaXMin, deltaXMax);
   h_deltaMCWgt->GetYaxis()->SetRangeUser(deltaYMin, deltaYMax);
   h_deltaMCWgt->SetTitle("Weighted MC to Data Comparison: #delta");
-  h_deltaMCWgt->Draw("B");
+  h_deltaMCWgt->Draw();
   h_deltaData->SetMarkerColor(4);
   h_deltaData->SetMarkerStyle(22);
   h_deltaData->Draw("E, SAME");
@@ -167,8 +178,8 @@ void compPlots() {
 
   c_tarComp->cd(4);
   h_xpTarDataClone->Divide(h_xpTarMCWgt);
-  h_xpTarDataClone->SetFillColor(28);
-  h_xpTarDataClone->SetFillStyle(3013);
+  h_xpTarDataClone->SetMarkerStyle(22);
+  h_xpTarDataClone->SetMarkerSize(1.25);
   h_xpTarDataClone->GetYaxis()->SetRangeUser(ratioMin, ratioMax);
   h_xpTarDataClone->GetXaxis()->SetRangeUser(xpTarXMin, xpTarXMax);
   h_xpTarDataClone->GetYaxis()->SetTitle("X'_{tar}^{data} / X'_{tar}^{MC}");
@@ -176,14 +187,14 @@ void compPlots() {
   h_xpTarDataClone->Draw();
   ln_xpTarComp = new TLine(xpTarXMin, idealRatio, xpTarXMax, idealRatio);
   ln_xpTarComp->SetLineStyle(9);
-  ln_xpTarComp->SetLineWidth(4);
+  ln_xpTarComp->SetLineWidth(2);
   ln_xpTarComp->SetLineColor(38);
   ln_xpTarComp->Draw();
 
   c_tarComp->cd(5);
   h_ypTarDataClone->Divide(h_ypTarMCWgt);
-  h_ypTarDataClone->SetFillColor(28);
-  h_ypTarDataClone->SetFillStyle(3013);
+  h_ypTarDataClone->SetMarkerStyle(22);
+  h_ypTarDataClone->SetMarkerSize(1.25);
   h_ypTarDataClone->GetYaxis()->SetRangeUser(ratioMin, ratioMax);
   h_ypTarDataClone->GetXaxis()->SetRangeUser(ypTarXMin, ypTarXMax);
   h_ypTarDataClone->GetYaxis()->SetTitle("Y'_{tar}^{data} / Y'_{tar}^{MC}");
@@ -191,14 +202,14 @@ void compPlots() {
   h_ypTarDataClone->Draw();
   ln_ypTarComp = new TLine(ypTarXMin, idealRatio, ypTarXMax, idealRatio);
   ln_ypTarComp->SetLineStyle(9);
-  ln_ypTarComp->SetLineWidth(4);
+  ln_ypTarComp->SetLineWidth(2);
   ln_ypTarComp->SetLineColor(38);
   ln_ypTarComp->Draw();
 
   c_tarComp->cd(6);
   h_deltaDataClone->Divide(h_deltaMCWgt);
-  h_deltaDataClone->SetFillColor(28);
-  h_deltaDataClone->SetFillStyle(3013);
+  h_deltaDataClone->SetMarkerStyle(22);
+  h_deltaDataClone->SetMarkerSize(1.25);
   h_deltaDataClone->GetYaxis()->SetRangeUser(ratioMin, ratioMax);
   h_deltaDataClone->GetXaxis()->SetRangeUser(deltaXMin, deltaXMax);
   h_deltaDataClone->GetYaxis()->SetTitle("#delta_{data} / #delta_{MC}");
@@ -206,19 +217,22 @@ void compPlots() {
   h_deltaDataClone->Draw();
   ln_deltaComp = new TLine(deltaXMin, idealRatio, deltaXMax, idealRatio);
   ln_deltaComp->SetLineStyle(9);
-  ln_deltaComp->SetLineWidth(4);
+  ln_deltaComp->SetLineWidth(2);
   ln_deltaComp->SetLineColor(38);
   ln_deltaComp->Draw();
 
   c_kinComp = new TCanvas("c_kinComp", "Comparison of Kinematic Variables", canWidth, canHeight); 
   c_kinComp->Divide(3, 2);
   c_kinComp->cd(1);
+  h_thetaMCWgt->Scale(scaleFactor);
+  h_thetaMCWgt->SetOption("HIST");
   h_thetaMCWgt->SetFillColor(8);
+  h_thetaMCWgt->SetLineColor(8);
   h_thetaMCWgt->SetFillStyle(3001);
   h_thetaMCWgt->GetXaxis()->SetRangeUser(thetaXMin, thetaXMax);
   h_thetaMCWgt->GetYaxis()->SetRangeUser(thetaYMin, thetaYMax);
   h_thetaMCWgt->SetTitle("Weighted MC to Data Comparison: #theta");
-  h_thetaMCWgt->Draw("B");
+  h_thetaMCWgt->Draw();
   h_thetaData->SetMarkerColor(4);
   h_thetaData->SetMarkerStyle(22);
   h_thetaData->Draw("E, SAME");
@@ -228,12 +242,15 @@ void compPlots() {
   l_thetaComp->Draw();
 
   c_kinComp->cd(2);
+  h_q2MCWgt->Scale(scaleFactor);
+  h_q2MCWgt->SetOption("HIST");
   h_q2MCWgt->SetFillColor(8);
+  h_q2MCWgt->SetLineColor(8);
   h_q2MCWgt->SetFillStyle(3001);
   h_q2MCWgt->GetXaxis()->SetRangeUser(q2XMin, q2XMax);
   h_q2MCWgt->GetYaxis()->SetRangeUser(q2YMin, q2YMax);
   h_q2MCWgt->SetTitle("Weighted MC to Data Comparison: Q^{2}");
-  h_q2MCWgt->Draw("B");
+  h_q2MCWgt->Draw();
   h_q2Data->SetMarkerColor(4);
   h_q2Data->SetMarkerStyle(22);
   h_q2Data->Draw("E, SAME");
@@ -243,12 +260,15 @@ void compPlots() {
   l_q2Comp->Draw();
 
   c_kinComp->cd(3);
+  h_w2MCWgt->Scale(scaleFactor);
+  h_w2MCWgt->SetOption("HIST");
   h_w2MCWgt->SetFillColor(8);
+  h_w2MCWgt->SetLineColor(8);
   h_w2MCWgt->SetFillStyle(3001);
   h_w2MCWgt->GetXaxis()->SetRangeUser(w2XMin, w2XMax);
   h_w2MCWgt->GetYaxis()->SetRangeUser(w2YMin, w2YMax);
   h_w2MCWgt->SetTitle("Weighted MC to Data Comparison: W^{2}");
-  h_w2MCWgt->Draw("B");
+  h_w2MCWgt->Draw();
   h_w2Data->SetMarkerColor(4);
   h_w2Data->SetMarkerStyle(22);
   h_w2Data->Draw("E, SAME");
@@ -259,8 +279,8 @@ void compPlots() {
 
   c_kinComp->cd(4);
   h_thetaDataClone->Divide(h_thetaMCWgt);
-  h_thetaDataClone->SetFillColor(28);
-  h_thetaDataClone->SetFillStyle(3013);
+  h_thetaDataClone->SetMarkerStyle(22);
+  h_thetaDataClone->SetMarkerSize(1.25);
   h_thetaDataClone->GetYaxis()->SetRangeUser(ratioMin, ratioMax);
   h_thetaDataClone->GetXaxis()->SetRangeUser(thetaXMin, thetaXMax);
   h_thetaDataClone->GetYaxis()->SetTitle("#theta_{data} / #theta_{MC}");
@@ -268,14 +288,14 @@ void compPlots() {
   h_thetaDataClone->Draw();
   ln_thetaComp = new TLine(thetaXMin, idealRatio, thetaXMax, idealRatio);
   ln_thetaComp->SetLineStyle(9);
-  ln_thetaComp->SetLineWidth(4);
+  ln_thetaComp->SetLineWidth(2);
   ln_thetaComp->SetLineColor(38);
   ln_thetaComp->Draw();
 
   c_kinComp->cd(5);
   h_q2DataClone->Divide(h_q2MCWgt);
-  h_q2DataClone->SetFillColor(28);
-  h_q2DataClone->SetFillStyle(3013);
+  h_q2DataClone->SetMarkerStyle(22);
+  h_q2DataClone->SetMarkerSize(1.25);
   h_q2DataClone->GetYaxis()->SetRangeUser(ratioMin, ratioMax);
   h_q2DataClone->GetXaxis()->SetRangeUser(q2XMin, q2XMax);
   h_q2DataClone->GetYaxis()->SetTitle("Q^{2}_{data} / Q^{2}_{MC}");
@@ -283,14 +303,14 @@ void compPlots() {
   h_q2DataClone->Draw();
   ln_q2Comp = new TLine(q2XMin, idealRatio, q2XMax, idealRatio);
   ln_q2Comp->SetLineStyle(9);
-  ln_q2Comp->SetLineWidth(4);
+  ln_q2Comp->SetLineWidth(2);
   ln_q2Comp->SetLineColor(38);
   ln_q2Comp->Draw();
 
   c_kinComp->cd(6);
   h_w2DataClone->Divide(h_w2MCWgt);
-  h_w2DataClone->SetFillColor(28);
-  h_w2DataClone->SetFillStyle(3013);
+  h_w2DataClone->SetMarkerStyle(22);
+  h_w2DataClone->SetMarkerSize(1.25);
   h_w2DataClone->GetYaxis()->SetRangeUser(ratioMin, ratioMax);
   h_w2DataClone->GetXaxis()->SetRangeUser(w2XMin, w2XMax);
   h_w2DataClone->GetYaxis()->SetTitle("W^{2}_{data} / W^{2}_{MC}");
@@ -298,7 +318,7 @@ void compPlots() {
   h_w2DataClone->Draw();
   ln_w2Comp = new TLine(w2XMin, idealRatio, w2XMax, idealRatio);
   ln_w2Comp->SetLineStyle(9);
-  ln_w2Comp->SetLineWidth(4);
+  ln_w2Comp->SetLineWidth(2);
   ln_w2Comp->SetLineColor(38);
   ln_w2Comp->Draw();
 

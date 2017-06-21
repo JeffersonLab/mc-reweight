@@ -52,10 +52,9 @@ TH2F *h2_xpVyFocalData, *h2_xpVypFocalData, *h2_yVypFocalData;
 TH2F *h2_yVxpTarData, *h2_yVypTarData, *h2_xpVypTarData;
 // Declare constants
 static const Double_t protonMass    = 0.938272;  // GeV
-static const Double_t mcScaleFactor = 1.75593104E-02;  // Output from recon_mc.f
+static const Double_t mcScaleFactor = 1.75593104E-02;  // Output from recon_mc.f 488->100k events
+
 static const Double_t rad2mrad      = 1000.0;
-//static const Double_t fudgeFactor   = 14.0;  // Arbitrary scaling factor
-static const Double_t fudgeFactor   = 14.0;  // Arbitrary scaling factor
 // Define functions to calculate kinematic variables
 Double_t calc_q2(Double_t beamEnergy, Double_t scatMom, Double_t scatAngle);
 Double_t calc_w2(Double_t beamEnergy, Double_t scatMom, Double_t scatAngle);
@@ -65,7 +64,7 @@ void mc_reweight() {
   // Open the ROOT files
   mcRawFile = new TFile("../../input/monte-carlo/kpp_shms_488.root");
   mcWgtFile = new TFile("../../output/mc-ntuples/mc488.root");
-  dataFile  = new TFile("../../input/shms-data/shms_replay_488_100000.root");
+  //  dataFile  = new TFile("../../input/shms-data/shms_replay_488_100000.root");
   compFile  = new TFile("../output/run_488_comp.root", "RECREATE");
   // Obtain the ROOT trees
   mcRawTree = dynamic_cast <TTree*> (mcRawFile->Get("h1411"));
@@ -160,17 +159,17 @@ void mc_reweight() {
   if(!mcWgtDir) {mcWgtDir = compFile->mkdir("mcWgtDir"); mcWgtDir->cd();}
   else compFile->cd("mcWgtDir");
   // Book weighted 1D MC histos
-  h_xFocalMCWgt  = new TH1F("h_xFocalMCWgt",  "Weighted Monte-Carlo: X_{fp}; X_{fp} (cm); Number of Entries / 5 mm",             160, -40, 40);    h_xFocalMCWgt->SetBit(TH1::kIsNotW);
-  h_xpFocalMCWgt = new TH1F("h_xpFocalMCWgt", "Weighted Monte-Carlo: X'_{fp}; X'_{fp}; Number of Entries / 2 mrad",              60, -60.0, 60.0); h_xpFocalMCWgt->SetBit(TH1::kIsNotW); 
-  h_yFocalMCWgt  = new TH1F("h_yFocalMCWgt",  "Weighted Monte-Carlo: Y_{fp}; Y_{fp} (cm); Number of Entries / 5 mm",             160, -40, 40);    h_yFocalMCWgt->SetBit(TH1::kIsNotW);
-  h_ypFocalMCWgt = new TH1F("h_ypFocalMCWgt", "Weighted Monte-Carlo: Y'_{fp}; Y'_{fp}; Number of Entries / 2 mrad",              60, -60.0, 60.0); h_ypFocalMCWgt->SetBit(TH1::kIsNotW);
-  h_yTarMCWgt    = new TH1F("h_yTarMCWgt",    "Weighted Monte-Carlo: Y_{tar}; Y_{tar} (cm); Number of Entries / 1 mm",           100, -5, 5);      h_yTarMCWgt->SetBit(TH1::kIsNotW);
-  h_xpTarMCWgt   = new TH1F("h_xpTarMCWgt",   "Weighted Monte-Carlo: X'_{tar}; X'_{tar}; Number of Entries / 2 mrad",            60, -60.0, 60.0); h_xpTarMCWgt->SetBit(TH1::kIsNotW); 
-  h_ypTarMCWgt   = new TH1F("h_ypTarMCWgt",   "Weighted Monte-Carlo: Y'_{tar}; Y'_{tar}; Number of Entries / 2 mrad",            60, -60.0, 60.0); h_ypTarMCWgt->SetBit(TH1::kIsNotW);
-  h_deltaMCWgt   = new TH1F("h_deltaMCWgt",   "Weighted Monte-Carlo: #delta; #delta; Number of Entries",                       80, -40, 40);     h_deltaMCWgt->SetBit(TH1::kIsNotW);
-  h_thetaMCWgt   = new TH1F("h_thetaMCWgt",   "Weighted Monte-Carlo: #theta; #theta; Number of Entries / 0.01 deg",              100, 10.0, 20.0); h_thetaMCWgt->SetBit(TH1::kIsNotW);
-  h_q2MCWgt      = new TH1F("h_q2MCWgt",      "Weighted Monte-Carlo: Q^{2}; Q^{2} (GeV^{2}); Number of Entries / 0.025 GeV^{2}", 120, 0.0, 3.0);   h_q2MCWgt->SetBit(TH1::kIsNotW);
-  h_w2MCWgt      = new TH1F("h_w2MCWgt",      "Weighted Monte-Carlo: W^{2}; W^{2} (GeV^{2}); Number of Entries / 0.050 GeV^{2}", 180, 0.0, 9.0);   h_w2MCWgt->SetBit(TH1::kIsNotW);
+  h_xFocalMCWgt  = new TH1F("h_xFocalMCWgt",  "Weighted Monte-Carlo: X_{fp}; X_{fp} (cm); Number of Entries / 5 mm",             160, -40, 40);    //h_xFocalMCWgt->SetBit(TH1::kIsNotW);
+  h_xpFocalMCWgt = new TH1F("h_xpFocalMCWgt", "Weighted Monte-Carlo: X'_{fp}; X'_{fp}; Number of Entries / 2 mrad",              60, -60.0, 60.0); //h_xpFocalMCWgt->SetBit(TH1::kIsNotW); 
+  h_yFocalMCWgt  = new TH1F("h_yFocalMCWgt",  "Weighted Monte-Carlo: Y_{fp}; Y_{fp} (cm); Number of Entries / 5 mm",             160, -40, 40);    //h_yFocalMCWgt->SetBit(TH1::kIsNotW);
+  h_ypFocalMCWgt = new TH1F("h_ypFocalMCWgt", "Weighted Monte-Carlo: Y'_{fp}; Y'_{fp}; Number of Entries / 2 mrad",              60, -60.0, 60.0); //h_ypFocalMCWgt->SetBit(TH1::kIsNotW);
+  h_yTarMCWgt    = new TH1F("h_yTarMCWgt",    "Weighted Monte-Carlo: Y_{tar}; Y_{tar} (cm); Number of Entries / 1 mm",           100, -5, 5);      //h_yTarMCWgt->SetBit(TH1::kIsNotW);
+  h_xpTarMCWgt   = new TH1F("h_xpTarMCWgt",   "Weighted Monte-Carlo: X'_{tar}; X'_{tar}; Number of Entries / 2 mrad",            60, -60.0, 60.0); //h_xpTarMCWgt->SetBit(TH1::kIsNotW); 
+  h_ypTarMCWgt   = new TH1F("h_ypTarMCWgt",   "Weighted Monte-Carlo: Y'_{tar}; Y'_{tar}; Number of Entries / 2 mrad",            60, -60.0, 60.0); //h_ypTarMCWgt->SetBit(TH1::kIsNotW);
+  h_deltaMCWgt   = new TH1F("h_deltaMCWgt",   "Weighted Monte-Carlo: #delta; #delta; Number of Entries",                         80, -40, 40);     //h_deltaMCWgt->SetBit(TH1::kIsNotW);
+  h_thetaMCWgt   = new TH1F("h_thetaMCWgt",   "Weighted Monte-Carlo: #theta; #theta; Number of Entries / 0.01 deg",              100, 10.0, 20.0); //h_thetaMCWgt->SetBit(TH1::kIsNotW);
+  h_q2MCWgt      = new TH1F("h_q2MCWgt",      "Weighted Monte-Carlo: Q^{2}; Q^{2} (GeV^{2}); Number of Entries / 0.025 GeV^{2}", 120, 0.0, 3.0);   //h_q2MCWgt->SetBit(TH1::kIsNotW);
+  h_w2MCWgt      = new TH1F("h_w2MCWgt",      "Weighted Monte-Carlo: W^{2}; W^{2} (GeV^{2}); Number of Entries / 0.050 GeV^{2}", 180, 0.0, 9.0);   //h_w2MCWgt->SetBit(TH1::kIsNotW);
   // Weighted 2D MC histos
   h2_xVxpFocalMCWgt  = new TH2F("h2_xVxpFocalMCWgt",  "Weighted Monte-Carlo: X_{fp} vs. X'_{fp}; X'_{fp} / 2 mrad; X_{fp} (cm) / 5 mm",    100, -100.0, 100.0, 160, -40, 40);
   h2_xVyFocalMCWgt   = new TH2F("h2_xVyFocalMCWgt",   "Weighted Monte-Carlo: X_{fp} vs. Y_{fp}; Y_{fp} (cm) / 5 mm; X_{fp} (cm) / 5 mm",   160, -40, 40, 160, -40, 40);
@@ -255,7 +254,7 @@ void mc_reweight() {
     Bool_t deltaPCut = TMath::Abs(deltaMCWgt - 5.0) < 15.0;
     if (!deltaPCut) continue;
     // Caluclate the scale factor
-    scaleFactor = (bornCS * mcScaleFactor) / (fudgeFactor * intRadCorr);
+    scaleFactor = (bornCS * mcScaleFactor) / (intRadCorr);
     // Fill histos
     // 1D histos
     h_xFocalMCWgt->Fill(xFocalMCWgt, scaleFactor);
