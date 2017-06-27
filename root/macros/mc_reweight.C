@@ -64,7 +64,7 @@ void mc_reweight() {
   // Open the ROOT files
   mcRawFile = new TFile("../../input/monte-carlo/kpp_shms_488.root");
   mcWgtFile = new TFile("../../output/mc-ntuples/mc488.root");
-  //  dataFile  = new TFile("../../input/shms-data/shms_replay_488_100000.root");
+  dataFile  = new TFile("../../input/shms-data/shms_replay_488_500000.root");
   compFile  = new TFile("../output/run_488_comp.root", "RECREATE");
   // Obtain the ROOT trees
   mcRawTree = dynamic_cast <TTree*> (mcRawFile->Get("h1411"));

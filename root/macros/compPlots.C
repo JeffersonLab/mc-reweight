@@ -70,7 +70,7 @@ static const Double_t idealRatio = 1.0;
 static const Double_t ratioMin   = 0.0;
 static const Double_t ratioMax   = 2.0;
 // Scale factor for MC events to match data
-static const Double_t scaleFactor = 1.5;
+static const Double_t scaleFactor = 0.4;
 
 
 void compPlots() {
