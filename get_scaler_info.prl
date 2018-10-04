@@ -26,9 +26,9 @@ my $pwd = cwd();
 # PUT THE PATH OF YOUR SCALER DIRECTORY HERE
 #my $scalerpath  = "/work/hu/disk2/Tvaskis/E02-109_E04-001/Analyzer/replay/scalers/";
 #my $scalerpath  = "/lustre/expphy/work/hallc/rosen07tmp/simona/pass3/scalers/";
-my $scalerpath = "/lustre/expphy/work/hallc/shms/pooser/mc-reweight/input/reports/";
-
-my $genfilename = join "", $scalerpath, "gen", $runno, ".txt";
+#my $scalerpath = "/lustre/expphy/work/hallc/shms/pooser/mc-reweight/input/reports/";
+my $scalerpath = "/lustre/expphy/cache/hallc/E12-10-002/f2xem/pass-2-data/shms-f2-all-reports/";
+my $genfilename = join "", $scalerpath, "replay_shms_production_", $runno, "_-1.report";
 
 open(SCALERFILE,$genfilename) or die "\n Cannot find $genfilename\n\n";
 
@@ -59,69 +59,56 @@ my $q2;
 
 while(<SCALERFILE>){
   
-   if(/helect.  D.T./){
+   if(/Electronic Live Time \(100, 200/){
     @tmp_str=split();
-    $edt = $tmp_str[3]; 
-    $elt = 1. - $edt/100.;
+    $elt = $tmp_str[9]/100.; 
   }                   
-   elsif(/hcomputer/){
+   elsif(/Ps2_factor/){
     @tmp_str=split();
-    $cdt = $tmp_str[3];
-    $clt = 1. - $cdt/100.;
+    $ps = $tmp_str[2];
   }
-    elsif(/targ num/){
+   elsif(/Pre-Scaled Ps2 SHMS Computer Live Time :/){
+    if($ps>0){
+      @tmp_str=split();
+      $clt = $tmp_str[7]/100.;
+    }
+  }
+   elsif(/Target AMU/){
     @tmp_str=split();
-    $target = $tmp_str[3];
+    if($tmp_str[3]==2.01){$target=15;}
+    if($tmp_str[3]==1.01){$target=11;}
+    if($tmp_str[3]==12.01){$target=4;}
+    if($tmp_str[3]==26.98){$target="99";}
   }
-    elsif(/Prescale Factors:/){
-    @tmp_str=split(); 
-    $ps = $tmp_str[3];
-  }
-   elsif(/hSCIN    =/){
-#   elsif(/hS1      =/){
-     @tmp_str=split(/=/);   
-     @tmp_str=split(/\[/);
-     $tmp_str[1]=~s/\].*//; 
-     $HMS_rate = $tmp_str[1]/1000;
+   elsif(/Physics 3\/4 Trigger Rate/){
+     @tmp_str=split();
+     $HMS_rate = $tmp_str[5];
   }            
-   elsif(/HMS 3/){
+   elsif(/3_of_4 EFF/){
      @tmp_str=split();
-     $HMS_34 = $tmp_str[4];
+     $HMS_34 = $tmp_str[3];
   } 
-   elsif(/hSTOF =/){
+   elsif(/E SING FID TRACK EFFIC /){
      @tmp_str=split();
-     $HMS_tof = $tmp_str[2];
-  }   
-   elsif(/hprlo e- effic/){
-     @tmp_str=split();
-     $HMS_prlo = $tmp_str[4];
-  }
-
-   elsif(/HMS fid effic  =/){
-     @tmp_str=split();
-     $HMS_trackeff = $tmp_str[4] ;
+     $HMS_trackeff = $tmp_str[6] ;
   } 
-   elsif(/bocur/){
+   elsif(/BCM4A Beam Cut Current:/){
      @tmp_str=split();
-     $BCM1 = $tmp_str[1];
-     $q1 =  $tmp_str[2];
+     $BCM1 = $tmp_str[4];
   } 
-
-    elsif(/bo2cur/){
+    elsif(/BCM4A Beam Cut Charge:/){
      @tmp_str=split();
-     $BCM2 = $tmp_str[1];
-     $q2 =  $tmp_str[2];
+     $q1 =  $tmp_str[4];
   }  
-
-   elsif(/E_beam/){
+   elsif(/Beam Energy/){
      @tmp_str=split();
-     $Ebeam = $tmp_str[2];
+     $Ebeam = $tmp_str[3];
   } 
-   elsif(/P_mom HMS/){
+   elsif(/Momentum/){
      @tmp_str=split();
-     $Ehms = $tmp_str[3];
+     $Ehms = $tmp_str[2]*(1.-0.015);
   } 
-   elsif(/Theta HMS/){
+   elsif(/Spec Theta/){
      @tmp_str=split();
      $Theta = $tmp_str[3];
   }             
@@ -131,7 +118,7 @@ while(<SCALERFILE>){
 #$avecharge = ($charge1+$charge2)/2.;
 #$avebcm = ($BCM1+$BCM2)/2.;
 close(SCALERFILE) or die "\n Cannot close $genfilename\n\n";
-print($target, " ",$Ebeam,  " ", $Ehms, " ", $Theta, " ", $ps, " ", $BCM1, " ", $BCM2," ", $q1, " ", $q2, " ", $clt, " ", $elt, " ", $HMS_trackeff, " ", $HMS_tof," ", $HMS_34," ", $HMS_prlo," ", $HMS_rate,  "\n");
+print($target, " ",$Ebeam,  " ", $Ehms, " ", $Theta, " ", $ps, " ", $BCM1, " ", $BCM1, " ", $q1, " ", $q1, " ", $clt, " ", $elt, " ", $HMS_trackeff, " ", $HMS_34, " ", $HMS_rate,  "\n");
 exit(0);
 
 

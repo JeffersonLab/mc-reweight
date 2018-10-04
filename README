@@ -13,7 +13,7 @@ To run the code requires the following:
 
 1.  A uniform generation MC ntuple (example c1_30_1.1.rzdat)
 
-2.  A file containing the radiative cross section on a grid in E', theta for the beam 
+2.  A file containing the radiative cross section on a grid in W^2, theta for the beam 
 energy of interest.  The code assumes this file is named 
 
 "rc94.dat"
@@ -22,7 +22,7 @@ Be sure to link the proper file.
 
 The format is:
 
- Ebeam, E', theta, cross section, radiative correction factor
+ Ebeam, W^2, theta, cross section, radiative correction factor
  
 For inelastic kinematics a grid spacing of 1 degree is usually fine, but for QE and 
 resonance kinematics a finer spacing might be required for best results.  I typically 

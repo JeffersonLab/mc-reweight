@@ -377,8 +377,8 @@ CCCCCCC           Get Model Cross section in nb/SR/GeV           CCCCCCCCC
          AA = targetdata(4)
 
          if(use_rcmod) then
-           call rc_mod(firstr,thetaini,thetacrad,hsev,1,t1,born)
-           call rc_mod(firstr,thetacrad,thetacrad,hsev,1,t1,sigmac)
+           call rc_mod(firstr,thetaini,thetacrad,w2,1,t1,born)
+           call rc_mod(firstr,thetacrad,thetacrad,w2,1,t1,sigmac)
 	   if(nu.LT.0.015.AND.w2.LT.0.84) born = 0.0
 	   
          else
@@ -421,7 +421,7 @@ CCCCC      Turn delta correction off    CCCCC
 CCCCCCC   Now Get RC corrections for event    CCCCCCCC
 
          if(newrc) then
-          call rc_mod(firstr,thetaini,thetacrad,hsev,1,rci,t1)
+          call rc_mod(firstr,thetaini,thetacrad,w2,1,rci,t1)
           rce = 1.
 c	  if(nu.LT.0.015.AND.w2.LT.0.84) rci = 0.0
 
@@ -516,7 +516,7 @@ c     &              eff_cer,eff_cal
        enddo
 
        if(use_rcmod) then
-         call rc_mod(firstr,thetacrad,thetacrad,hsev,1,t1,sigmacent)
+         call rc_mod(firstr,thetacrad,thetacrad,w2,1,t1,sigmacent)
        else
          call model_new(ebeam,hsec,thetacrad,target,sigmacent)  
        endif
